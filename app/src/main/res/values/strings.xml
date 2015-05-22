@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">InstaPic</string>
+
+    <string name="editNameHint">Enter Name</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_display_activity_intent">DisplayActivityIntent</string>
+
+    <string name="hello_world">Hello world!</string>
+</resources>
