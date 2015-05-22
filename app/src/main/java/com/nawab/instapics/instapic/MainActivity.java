@@ -3,6 +3,8 @@ package com.nawab.instapics.instapic;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -21,6 +23,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,12 +33,13 @@ public class MainActivity extends ListActivity {
 
     EditText editTextInfo;
     String info;
-    TextView txtview,txtview2;
+    TextView txtview, txtview2;
 
 
     public static final String PostManName = "com.nawab.instapics.instapic";
 
     List<User> userList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,13 +56,12 @@ public class MainActivity extends ListActivity {
         editTextInfo = (EditText) findViewById(R.id.ediTname);
         info = editTextInfo.getText().toString();
 
-        if(checkInternet() == true){
+        if (checkInternet() == true) {
             MyTask bg_tasks = new MyTask();
-            bg_tasks.execute("https://maps.googleapis.com/maps/api/geocode/json?address="+info);
-        }else{
-            Toast.makeText(this,"No Internet Connection",Toast.LENGTH_LONG).show();
+            bg_tasks.execute("https://maps.googleapis.com/maps/api/geocode/json?address=" + info);
+        } else {
+            Toast.makeText(this, "No Internet Connection", Toast.LENGTH_LONG).show();
         }
-
 
 
     }
@@ -70,7 +74,7 @@ public class MainActivity extends ListActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem    item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -84,31 +88,30 @@ public class MainActivity extends ListActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public boolean checkInternet(){
+    public boolean checkInternet() {
 
-        ConnectivityManager cm = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo result = cm.getActiveNetworkInfo();
         if (result != null && result.isConnectedOrConnecting()) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
 
-    private class MyTask extends AsyncTask<String,Integer,String>{
+    private class MyTask extends AsyncTask<String, Integer, List<User>> {
 
 
         @Override
         protected void onPreExecute() {
-            txtview = (TextView)findViewById(R.id.textView);
+            txtview = (TextView) findViewById(R.id.textView);
             txtview.setText("Execution started");
         }
 
         @Override
 
 
-
-        protected String doInBackground(String... params) {
+        protected List<User> doInBackground(String... params) {
             String content = Connection.getData(params[0]);
             if (content != null) {
                 try {
@@ -125,61 +128,41 @@ public class MainActivity extends ListActivity {
                     content = latitude + " " + longitude;
                     String instaContent = "";
 
-                    instaContent = Connection.getData("https://api.instagram.com/v1/media/search?lat="+latitude+"&lng="+longitude+"&distance=2000&client_id=58e8fb0df1954de69238ce3057013f10");
-                    if (instaContent != null) {
-                        try {
-                            JSONObject root = new JSONObject(instaContent);
-                            JSONArray data = root.getJSONArray("data");
-//                            String userList = "";
+                    instaContent = Connection.getData("https://api.instagram.com/v1/media/search?lat=" + latitude + "&lng=" + longitude + "&distance=2000&client_id=58e8fb0df1954de69238ce3057013f10");
+                    userList = JsonParser.parseFeed(instaContent);
 
-//                            for (int i = 0; i < data.length(); i++) {
-//                                JSONObject user = data.getJSONObject(i);
-//                                double timeUploaded = user.getDouble("created_time");
-//
-//                                JSONObject userObj = user.getJSONObject("user");
-//                                String userName = userObj.getString("username");
-//                                String profilePic = userObj.getString("profile_picture");
-//
-//
-//                                JSONObject image = user.getJSONObject("images");
-//                                JSONObject pic_res = image.getJSONObject("low_resolution");
-//                                String uploadedPic = pic_res.getString("url");
-//
-//
-//                                String user_name = userObj.getString("userName");
-//
-//
-//                                User listObject = new User();
-//                                listObject.setUser_name(userName);
-//                                listObject.setProfile_pic(profilePic);
-//                                listObject.setUploaded_photo(uploadedPic);
-//                                listObject.setPic_uploaded_time(timeUploaded);
-//
-//                            }
-                            return instaContent;
-                        } catch (JSONException e) {
+                    for(User user:userList){
+                        try {
+                            String url = user.getUploaded_photo();
+                            InputStream in = (InputStream)new URL(url).getContent();
+                            Bitmap bitmap = BitmapFactory.decodeStream(in);
+                            user.setBitmap(bitmap);
+                            in.close();
+                        }catch (Exception e){
                             e.printStackTrace();
-                            return "A";
                         }
-                    }
-                    return "no one Near by Ohhhh Masturbate by yourself !!";
+                       }
+                    return userList;
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    return "B";
+                    return null;
                 }
-            }
-
-            return "Wrong Location";
-        }
-
-        @Override
-        protected void onPostExecute(String v) {
-
-            userList = JsonParser.parseFeed(v);
-          UserAdapter adapter = new UserAdapter(MainActivity.this, R.layout.list_item, userList);
-            setListAdapter(adapter);
-
+            }else{return null;}
 
         }
+
+
+
+
+
+    @Override
+    protected void onPostExecute(List<User> userList) {
+
+
+        UserAdapter adapter = new UserAdapter(MainActivity.this, R.layout.list_item, userList);
+        setListAdapter(adapter);
+
+
     }
+}
 }

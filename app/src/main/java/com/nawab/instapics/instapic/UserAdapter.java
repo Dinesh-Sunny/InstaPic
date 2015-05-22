@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -31,6 +32,9 @@ public class UserAdapter extends ArrayAdapter<User> {
         User user = userViewObj.get(position);
         TextView tv = (TextView)view.findViewById(R.id.simple_list_item);
         tv.setText(user.getUser_name());
+
+        ImageView image = (ImageView)view.findViewById(R.id.imageView);
+        image.setImageBitmap(user.getBitmap());
 
         return view;
     }

@@ -1,5 +1,7 @@
 package com.nawab.instapics.instapic;
 
+import android.graphics.Bitmap;
+
 /**
  * Created by Macbook on 21/05/15.
  */
@@ -9,7 +11,15 @@ public class User {
     private String profile_pic;
     private String uploaded_photo;
     private Double pic_uploaded_time;
+    private Bitmap bitmap;
 
+    public Bitmap getBitmap() {
+        return bitmap;
+    }
+
+    public void setBitmap(Bitmap bitmap) {
+        this.bitmap = bitmap;
+    }
 
     public String getUser_name() {
         return user_name;
@@ -42,7 +52,6 @@ public class User {
     public void setPic_uploaded_time(Double pic_uploaded_time) {
         this.pic_uploaded_time = pic_uploaded_time;
     }
-
 
 
 }
