@@ -104,8 +104,8 @@ public class MainActivity extends ListActivity {
 
         @Override
         protected void onPreExecute() {
-            txtview = (TextView) findViewById(R.id.textView);
-            txtview.setText("Execution started");
+           txtview = (TextView) findViewById(R.id.textView);
+          txtview.setText("Execution started");
         }
 
         @Override
@@ -131,17 +131,7 @@ public class MainActivity extends ListActivity {
                     instaContent = Connection.getData("https://api.instagram.com/v1/media/search?lat=" + latitude + "&lng=" + longitude + "&distance=2000&client_id=58e8fb0df1954de69238ce3057013f10");
                     userList = JsonParser.parseFeed(instaContent);
 
-                    for(User user:userList){
-                        try {
-                            String url = user.getUploaded_photo();
-                            InputStream in = (InputStream)new URL(url).getContent();
-                            Bitmap bitmap = BitmapFactory.decodeStream(in);
-                            user.setBitmap(bitmap);
-                            in.close();
-                        }catch (Exception e){
-                            e.printStackTrace();
-                        }
-                       }
+
                     return userList;
                 } catch (JSONException e) {
                     e.printStackTrace();
