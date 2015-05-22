@@ -1,5 +1,6 @@
 package com.nawab.instapics.instapic;
 
+import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -24,12 +25,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ListActivity {
 
     EditText editTextInfo;
     String info;
     TextView txtview,txtview2;
-    ListView lv;
+
 
     public static final String PostManName = "com.nawab.instapics.instapic";
 
@@ -39,7 +40,7 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        lv = (ListView)findViewById(R.id.listView);
+
         userList = new ArrayList<>();
 
 
@@ -175,13 +176,8 @@ public class MainActivity extends ActionBarActivity {
         protected void onPostExecute(String v) {
 
             userList = JsonParser.parseFeed(v);
-            txtview2 = (TextView)findViewById(R.id.textView2);
-//            for (int i = 0 ;i<userList.size();i++){
-//                userList.get(i);
-//
-//
-//            }
-            txtview2.setText(v);
+          UserAdapter adapter = new UserAdapter(MainActivity.this, R.layout.list_item, userList);
+            setListAdapter(adapter);
 
 
         }
